@@ -111,27 +111,12 @@ def metric(accuracy):
         json.dump(metrics, f)
 
 
-def main():
-    parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
-    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
-                        help='input batch size for training (default: 64)')
-    parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
-                        help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=1, metavar='N',
-                        help='number of epochs to train (default: 14)')
-    parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
-                        help='learning rate (default: 1.0)')
-    parser.add_argument('--seed', type=int, default=1, metavar='S',
-                        help='random seed (default: 1)')
-    parser.add_argument('--log-interval', type=int, default=10, metavar='N',
-                        help='how many batches to wait before logging training status')
-    args = parser.parse_args()
-
+def run(args):
     torch.manual_seed(args.seed)
     device = torch.device("cuda")
     train_kwargs = {'batch_size': args.batch_size}
     test_kwargs = {'batch_size': args.test_batch_size}
-    cuda_kwargs = {'num_workers': 1,
+    cuda_kwargs = {'num_workers': args.num_workers,
                    'pin_memory': True,
                    'shuffle': True}
     train_kwargs.update(cuda_kwargs)
@@ -141,8 +126,8 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
         ])
-    dataset1 = datasets.MNIST('/mnt/dataset', train=True, transform=transform)
-    dataset2 = datasets.MNIST('/mnt/dataset', train=False, transform=transform)
+    dataset1 = datasets.MNIST(args.dataset_dir, train=True, transform=transform)
+    dataset2 = datasets.MNIST(args.dataset_dir, train=False, transform=transform)
     train_loader = torch.utils.data.DataLoader(dataset1, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(dataset2, **test_kwargs)
 
@@ -153,9 +138,21 @@ def main():
         train(args, model, device, train_loader, optimizer, epoch)
         scheduler.step()
 
-    torch.save(model.state_dict(), "/mnt/model/mnist_cnn.pt")
+    torch.save(model.state_dict(), args.log_dir + "/mnist_cnn.pt")
     test(model, device, test_loader)
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
+    parser.add_argument('--train_batch', type=int, default=64, help='input batch size for training')
+    parser.add_argument('--test_batch', type=int, default=1000, help='input batch size for testing')
+    parser.add_argument('--epochs', type=int, default=1, help='number of epochs to train')
+    parser.add_argument('--lr', type=float, default=1.0, metavar='LR', help='learning rate')
+    parser.add_argument('--seed', type=int, default=1, help='random seed')
+    parser.add_argument('--snap', type=int, default=100)
+    parser.add_argument('--num_workers', type=int, default=4, help='cpu number for data load')
+    parser.add_argument('--dataset_dir', type=str, default='/mnt/dataset', help='dataset dir')
+    parser.add_argument('--log_dir', type=str, default='/mnt/logs', help='model save dir')
+    args = parser.parse_args()
+
+    run(args)
