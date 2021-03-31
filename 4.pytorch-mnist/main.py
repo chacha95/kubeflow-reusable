@@ -1,10 +1,12 @@
-import argparse
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
+
+import json
+import argparse
 
 
 class Net(nn.Module):
@@ -66,6 +68,48 @@ def test(model, device, test_loader):
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
 
+    accuracy = correct / len(test_loader.dataset)
+    metric(accuracy)
+
+
+def metric(accuracy):
+    """
+    metrics = {
+        'metrics': [{
+            'name': 'accuracy-score',
+            'numberValue': accuracy,
+            'format': "PERCENTAGE",
+        }
+        , {
+            'name': 'f1-score',
+            'numberValue': f1,
+            'format': "PERCENTAGE",
+        }, {
+            'name': 'precision-score',
+            'numberValue': precision,
+            'format': "PERCENTAGE",
+        }, {
+            'name': 'recall-score',
+            'numberValue': recall,
+            'format': "PERCENTAGE",
+        }]
+    }
+    """
+
+    # accuracy
+    metrics = {
+        'metrics': [{
+            'name': 'accuracy-score',
+            'numberValue': accuracy,
+            'format': "PERCENTAGE",
+        }]
+    }
+
+    with open('/accuracy.json', 'w') as f:
+        json.dump(accuracy, f)
+    with open('/mlpipeline-metrics.json', 'w') as f:
+        json.dump(metrics, f)
+
 
 def main():
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -73,7 +117,7 @@ def main():
                         help='input batch size for training (default: 64)')
     parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
                         help='input batch size for testing (default: 1000)')
-    parser.add_argument('--epochs', type=int, default=10, metavar='N',
+    parser.add_argument('--epochs', type=int, default=1, metavar='N',
                         help='number of epochs to train (default: 14)')
     parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
                         help='learning rate (default: 1.0)')
@@ -107,9 +151,10 @@ def main():
     scheduler = StepLR(optimizer, step_size=1)
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
-        test(model, device, test_loader)
         scheduler.step()
+
     torch.save(model.state_dict(), "/mnt/model/mnist_cnn.pt")
+    test(model, device, test_loader)
 
 
 if __name__ == '__main__':
