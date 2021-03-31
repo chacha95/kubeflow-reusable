@@ -90,7 +90,8 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
         ])
-    dataset1 = datasets.MNIST('/', train=True, download=True, transform=transform)
+
+    dataset1 = datasets.MNIST('/mnt/data', train=True, download=False, transform=transform)
     train_loader = torch.utils.data.DataLoader(dataset1, **train_kwargs)
 
     model = Net().to(device)

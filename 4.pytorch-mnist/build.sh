@@ -1,5 +1,5 @@
 img_name=mnist
-ver=1.0v
+ver=1.5v
 
 # train
 docker build -t "${img_name}_train:$ver" ./train
