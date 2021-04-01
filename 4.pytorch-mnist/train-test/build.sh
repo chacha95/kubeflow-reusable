@@ -1,5 +1,5 @@
-img_name=mnist
-ver=3.0v
+img_name=mnist_local
+ver=0.1
 
 # train
 docker build -t "${img_name}:$ver" .
