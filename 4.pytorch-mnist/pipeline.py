@@ -50,7 +50,8 @@ if __name__ == "__main__":
     kfp.compiler.Compiler().compile(pipeline_func, '{}.zip'.format(experiment_name))
 
     # Submit pipeline to kubeflow server directly
-    client = kfp.Client(host='pipelines-api.kubeflow.svc.cluster.local:8888')
+    client = kfp.Client(host='pipelines-api.kubeflow.svc.cluster.local:8888',
+                        namespace='kubeflow')
     run_result = client.create_run_from_pipeline_func(pipeline_func,
                                                       experiment_name=experiment_name,
                                                       run_name=run_name,
