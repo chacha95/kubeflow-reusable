@@ -149,7 +149,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=1, help='number of epochs to train')
     parser.add_argument('--lr', type=float, default=1.0, metavar='LR', help='learning rate')
     parser.add_argument('--seed', type=int, default=1, help='random seed')
-    parser.add_argument('--snap', type=int, default=100)
+    parser.add_argument('--log_interval', type=int, default=100)
     parser.add_argument('--num_workers', type=int, default=4, help='cpu number for data load')
     parser.add_argument('--dataset_dir', type=str, default='/mnt/dataset', help='dataset dir')
     parser.add_argument('--log_dir', type=str, default='/mnt/logs', help='model save dir')
