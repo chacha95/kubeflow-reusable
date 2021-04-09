@@ -1,6 +1,6 @@
 registry=ckwlsgur20
 img_name=mnist
-ver=2.5v
+ver=4.0v
 
 docker build -t "${img_name}:$ver" .
 docker tag "${img_name}:$ver" "${registry}/${img_name}:$ver"
